@@ -8,9 +8,9 @@ Gem::Specification.new do |gem|
   gem.version       = Eirobridge::VERSION
   gem.authors       = ["Greg Lu"]
   gem.email         = ["greg.lu@where.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
-  gem.homepage      = ""
+  gem.description   = %q{}
+  gem.summary       = %q{}
+  gem.homepage      = "https://github.com/greglu/eirobridge"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
