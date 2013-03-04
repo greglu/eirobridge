@@ -40,19 +40,16 @@ server.on('upgrade', function(req, socket, head) {
                'Connection: Upgrade\r\n' +
                '\r\n');
 
-  console.log("%s : %s", id, "CONNECTED");
 
   var d = dnode({
-    transform : function (s, cb) {
-      cb(s + ' => ' + s.toUpperCase());
-    },
-    hi : function(cb) {
-      cb('hi');
+    ping : function(cb) {
+      cb('pong');
     }
   });
 
   d.on('remote', function (remote) {
     active_remotes[id] = remote;
+    console.log("%s : %s", id, "CONNECTED");
   });
 
   socket.pipe(d).pipe(socket);
