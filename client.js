@@ -9,12 +9,19 @@ function connect() {
 
   var req = http.request({
     port: 8008,
+    // hostname: 'www.heuheuheu.com',
     hostname: 'localhost',
     headers: {
       'Connection': 'Upgrade',
       'Upgrade': 'websocket'
     }
   });
+
+  req.on('error', function(e) {
+    console.log('Error connecting to server: ' + e.message + '. Reconnecting in 5 seconds...');
+    setTimeout(connect, 5000);
+  });
+
   req.end();
 
   req.on('upgrade', function(res, socket, upgradeHead) {
@@ -35,9 +42,7 @@ function connect() {
     d.on('remote', function (remote) {
       server_remote = remote;
       heartBeat = setInterval(function() {
-        server_remote.ping(function(s) {
-          console.log(s);
-        });
+        server_remote.ping(function(s) {});
       }, 20000);
       console.log("%s : %s", req.connection.remoteAddress, "CONNECTED TO SERVER");
     });
@@ -49,11 +54,11 @@ function connect() {
     });
 
     socket.on('close', function() {
-      console.log('CONNECTION CLOSED WITH SERVER');
+      console.log('CONNECTION CLOSED WITH SERVER. Reconnecting in 5 seconds...');
       if (heartBeat) {
         clearInterval(heartBeat);
       }
-      connect();
+      setTimeout(connect, 5000);
     });
 
   });
