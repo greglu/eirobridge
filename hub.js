@@ -12,6 +12,11 @@ var rc = require('rc')('eirobridge', {
   heartbeatPeriod: 20000
 });
 
+// Append an http if none was provided
+if (!rc.url.match(/^\s*(https*:\/\/.*)/)) {
+  rc.url = 'http://' + rc.url;
+}
+
 var subscribers = levelup('./subscribers');
 
 var server_remote;
