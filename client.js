@@ -1,36 +1,35 @@
-var reconnect = require('reconnect');
-var shoe = require('shoe');
+var http = require('http');
 var dnode = require('dnode');
-var net = require('net');
-var sys = require("sys");
+
+var req = http.request({
+  port: 8008,
+  hostname: 'localhost',
+  headers: {
+    'Connection': 'Upgrade',
+    'Upgrade': 'websocket'
+  }
+});
+req.end();
 
 var server_remote;
 
-reconnect(function (conn) {
-  var d = dnode();
+req.on('upgrade', function(res, socket, upgradeHead) {
+  var d = dnode({
+    broadcast: function(payload, cb) {
+      console.log('--- OUTPUTTING BROADCAST ---');
+      console.log(payload);
+      console.log('--- FINISHED BROADCAST ---');
+    }
+  });
+
   d.on('remote', function (remote) {
-
     server_remote = remote;
-
-    remote.transform('baeioup', function (s) {
-      console.log(s);
-    });
-
   });
 
-  conn.pipe(d).pipe(conn);
-}).connect(8008);
+  socket.pipe(d).pipe(socket);
 
-
-var stdin = process.openStdin();
-stdin.addListener("data", function (d) {
-  // note:  d is an object, and when converted to a string it will
-  // end with a linefeed.  so we (rather crudely) account for that
-  // with toString() and then substring()
-  var input = d.toString().substring(0, d.length-1);
-  // console.log("you entered: [" + input + "]");
-
-  server_remote.transform(input, function (s) {
-    console.log(s);
+  socket.on('close', function() {
+    console.log('Server connection closed!');
   });
+
 });
