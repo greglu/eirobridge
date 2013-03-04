@@ -27,7 +27,7 @@ var server = http.createServer(function (req, res) {
     });
   } else {
     res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end('okay');
+    res.end('eirobridge');
   }
 });
 
@@ -39,7 +39,6 @@ server.on('upgrade', function(req, socket, head) {
                'Upgrade: WebSocket\r\n' +
                'Connection: Upgrade\r\n' +
                '\r\n');
-
 
   var d = dnode({
     ping : function(cb) {
