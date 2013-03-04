@@ -14,9 +14,21 @@
   }
 </style>
 <body>
-<form action="." method="POST">
-<input type="text" name="subscriber" />
-<input type="submit" value="Subscribe" />
-</form>
+  <h1><a href="{{ eirobridge }}">{{ eirobridge }}</a></h1>
+
+  <h3>Subscribers</h3>
+  <ul>
+    {% for subscriber in subscribers %}
+    <li>{{ subscriber }}</li>
+    {% endfor %}
+  </ul>
+
+  <h3>Subscribe a new endpoint</h3>
+  <div>
+    <form action="." method="POST">
+      <input type="text" name="subscriber" />
+      <input type="submit" value="Subscribe" />
+    </form>
+  </div>
 </body>
 </html>

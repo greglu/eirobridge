@@ -4,7 +4,9 @@
   "description": "Eirobridge",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "bridge": "node index.js",
+    "hub": "node hub.js"
   },
   "repository": "",
   "author": "Greg Lu <greg.lu@gmail.com>",
@@ -14,9 +16,9 @@
     "node-uuid": "~1.4.0",
     "levelup": "~0.6.0",
     "reconnect": "~1.0.2",
-    "ecstatic": "",
     "underscore": "",
-    "rc": ""
+    "rc": "",
+    "swig": ""
   },
   "devDependencies": {
     "browserify": "~2.3.1"

@@ -3,10 +3,13 @@ var dnode = require('dnode');
 var querystring = require('querystring');
 var levelup = require('levelup');
 var url = require('url');
-var ecstatic = require('ecstatic')(__dirname + '/public');
+var _ = require('underscore');
+var swig  = require('swig');
+
+var indexTemplate = swig.compileFile(__dirname + '/public/index.html');
 var rc = require('rc')('eirobridge', {
-  host: 'localhost',
-  port: 8008
+  url: 'http://localhost:8008',
+  heartbeatPeriod: 20000
 });
 
 var subscribers = levelup('./subscribers');
@@ -68,12 +71,16 @@ var server = http.createServer(function (req, res) {
       }
     });
   } else {
+    var activeSubscribers = [];
+
     subscribers.createKeyStream()
       .on('data', function (data) {
-        console.log('key=', data)
+        activeSubscribers.push(data);
+      })
+      .on('end', function() {
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        res.end(indexTemplate.render({ eirobridge: rc.url, subscribers: activeSubscribers }));
       });
-
-    return ecstatic(req, res);
   }
 });
 
@@ -82,14 +89,13 @@ server.listen(8010);
 
 function connect() {
 
-  var req = http.request({
-    hostname: rc.host,
-    port: rc.port,
-    headers: {
+  var eirobridgeOptions = url.parse(rc.url);
+  eirobridgeOptions.headers = {
       'Connection': 'Upgrade',
       'Upgrade': 'websocket'
-    }
-  });
+    };
+
+  var req = http.request(eirobridgeOptions);
 
   req.on('error', function(e) {
     console.log('Error connecting to server: ' + e.message + '. Reconnecting in 5 seconds...');
@@ -106,21 +112,25 @@ function connect() {
 
     var d = dnode({
       broadcast: function(message, cb) {
-        console.log(message);
-
-        var parsedPayload = querystring.parse(message.payload);
-        console.log('--- OUTPUTTING BROADCAST ---');
-        console.log(parsedPayload);
+        console.log('--- MESSAGE RECEIVED FOR BROADCASTING ---');
+        console.log(querystring.parse(message.payload));
+        console.log('--- EO BROADCAST MESSAGE ---');
 
         subscribers.createKeyStream()
           .on('data', function (subscriber) {
-            var subscriberUrl = url.parse(subscriber);
-            subscriberUrl.method = 'POST';
-            subscriberUrl.headers = {
-              'X-Forwarded-For': message.connection.remoteAddress
-            };
+            var subscriberOptions = url.parse(subscriber);
+            subscriberOptions.method = 'POST';
+            subscriberOptions.headers = subscriberOptions.headers || {};
 
-            var req = http.request(subscriberUrl, function(res) {
+            _.extend(subscriberOptions.headers,
+              _.pick(message.headers, 'content-type', 'user-agent'),
+              {
+                'X-Forwarded-For': message.connection.remoteAddress,
+                'Content-Length': message.payload.length
+              }
+            );
+
+            var req = http.request(subscriberOptions, function(res) {
               res.setEncoding('utf8');
             });
 
@@ -128,11 +138,8 @@ function connect() {
               console.log('Subscriber (' + subscriber + ') error: ' + e.message);
             });
 
-            req.write(message.payload);
-            req.end();
+            req.end(message.payload);
           });
-
-        console.log('--- FINISHED BROADCAST ---');
       }
     });
 
@@ -140,14 +147,14 @@ function connect() {
       server_remote = remote;
       heartBeat = setInterval(function() {
         server_remote.ping(function(s) {});
-      }, 20000);
+      }, rc.heartbeatPeriod);
       console.log("%s : %s", req.connection.remoteAddress, "CONNECTED TO SERVER");
     });
 
     socket.pipe(d).pipe(socket);
 
     socket.on('timeout', function() {
-      console.log('TIMED OUT');
+      console.log('CONNECTION TO SERVER TIMED OUT');
     });
 
     socket.on('close', function() {

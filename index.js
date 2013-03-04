@@ -28,10 +28,11 @@ var server = http.createServer(function (req, res) {
 
       console.log('--- BROADCASTING MESSAGE ---');
       console.log(broadcastMessage);
-      console.log('--- FINISHED BROADCASTING ---');
+      console.log('--- EO BROADCASTING MESSAGE ---');
 
-      _.each(active_remotes, function (remote) {
+      _.each(active_remotes, function (remote, id) {
         remote.broadcast(broadcastMessage);
+        console.log('Broadcasted to: ' + id)
       });
     });
   } else {
