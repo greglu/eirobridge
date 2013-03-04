@@ -3,6 +3,10 @@ var http = require('http');
 var uuid = require('node-uuid');
 var _ = require('underscore');
 
+var rc = require('rc')('eirobridge', {
+  port: 8008
+});
+
 var active_remotes = {};
 
 var server = http.createServer(function (req, res) {
@@ -17,12 +21,17 @@ var server = http.createServer(function (req, res) {
       res.writeHead(200, {'Content-Type': 'text/plain'});
       res.end('posted');
 
-      console.log('--- BROADCASTING PAYLOAD ---');
-      console.log(payload);
+      var broadcastMessage = {};
+      broadcastMessage.payload = payload;
+      broadcastMessage.headers = req.headers;
+      broadcastMessage.connection = _.pick(req.connection, 'remoteAddress', 'remotePort');
+
+      console.log('--- BROADCASTING MESSAGE ---');
+      console.log(broadcastMessage);
       console.log('--- FINISHED BROADCASTING ---');
 
       _.each(active_remotes, function (remote) {
-        remote.broadcast(payload);
+        remote.broadcast(broadcastMessage);
       });
     });
   } else {
@@ -59,4 +68,4 @@ server.on('upgrade', function(req, socket, head) {
   });
 });
 
-server.listen(8008);
+server.listen(rc.port);

@@ -4,11 +4,31 @@ var querystring = require('querystring');
 var levelup = require('levelup');
 var url = require('url');
 var ecstatic = require('ecstatic')(__dirname + '/public');
+var rc = require('rc')('eirobridge', {
+  host: 'localhost',
+  port: 8008
+});
 
 var subscribers = levelup('./subscribers');
 
 var server_remote;
 
+
+function extractSubscriber(bodyData) {
+  if (!bodyData) { return null; }
+
+  var parsedBodyData = querystring.parse(bodyData);
+  var subscriber = !!(parsedBodyData.subscriber) ? parsedBodyData.subscriber : bodyData;
+  var subscriberUrl = url.parse(subscriber);
+
+  // Using url.parse to validate the input of subscriber from bodyData, but sending back
+  // in unparsed form.
+  if (subscriberUrl.protocol && subscriberUrl.host && subscriberUrl.path) {
+    return subscriber;
+  } else {
+    return null;
+  }
+}
 
 var server = http.createServer(function (req, res) {
   if (req.method == "POST") {
@@ -19,11 +39,8 @@ var server = http.createServer(function (req, res) {
     });
 
     req.on("end", function() {
-      var parsedBodyData = querystring.parse(bodyData);
-      var subscriber = !!(parsedBodyData.subscriber) ? parsedBodyData.subscriber : bodyData;
-
-      var subscriberUrl = url.parse(subscriber);
-      if (subscriberUrl.protocol && subscriberUrl.host && subscriberUrl.path) {
+      var subscriber = extractSubscriber(bodyData);
+      if (subscriber) {
         subscribers.put(subscriber, 1);
         res.writeHead(201, {'Content-Type': 'text/plain'});
         res.end(subscriber + ' successfully added');
@@ -40,11 +57,8 @@ var server = http.createServer(function (req, res) {
     });
 
     req.on("end", function() {
-      var parsedBodyData = querystring.parse(bodyData);
-      var subscriber = !!(parsedBodyData.subscriber) ? parsedBodyData.subscriber : bodyData;
-
-      var subscriberUrl = url.parse(subscriber);
-      if (subscriberUrl.protocol && subscriberUrl.host && subscriberUrl.path) {
+      var subscriber = extractSubscriber(bodyData);
+      if (subscriber) {
         subscribers.del(subscriber);
         res.writeHead(200, {'Content-Type': 'text/plain'});
         res.end(subscriber + ' successfully deleted');
@@ -69,9 +83,8 @@ server.listen(8010);
 function connect() {
 
   var req = http.request({
-    port: 8008,
-    hostname: 'www.heuheuheu.com',
-    // hostname: 'localhost',
+    hostname: rc.host,
+    port: rc.port,
     headers: {
       'Connection': 'Upgrade',
       'Upgrade': 'websocket'
@@ -92,8 +105,10 @@ function connect() {
     socket.setTimeout(0);
 
     var d = dnode({
-      broadcast: function(payload, cb) {
-        var parsedPayload = querystring.parse(payload);
+      broadcast: function(message, cb) {
+        console.log(message);
+
+        var parsedPayload = querystring.parse(message.payload);
         console.log('--- OUTPUTTING BROADCAST ---');
         console.log(parsedPayload);
 
@@ -101,10 +116,11 @@ function connect() {
           .on('data', function (subscriber) {
             var subscriberUrl = url.parse(subscriber);
             subscriberUrl.method = 'POST';
+            subscriberUrl.headers = {
+              'X-Forwarded-For': message.connection.remoteAddress
+            };
 
             var req = http.request(subscriberUrl, function(res) {
-              console.log('STATUS: ' + res.statusCode);
-              console.log('HEADERS: ' + JSON.stringify(res.headers));
               res.setEncoding('utf8');
             });
 
@@ -112,7 +128,7 @@ function connect() {
               console.log('Subscriber (' + subscriber + ') error: ' + e.message);
             });
 
-            req.write(payload);
+            req.write(message.payload);
             req.end();
           });
 

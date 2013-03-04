@@ -15,7 +15,8 @@
     "levelup": "~0.6.0",
     "reconnect": "~1.0.2",
     "ecstatic": "",
-    "underscore": ""
+    "underscore": "",
+    "rc": ""
   },
   "devDependencies": {
     "browserify": "~2.3.1"
