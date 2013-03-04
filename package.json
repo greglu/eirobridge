@@ -14,6 +14,7 @@
     "node-uuid": "~1.4.0",
     "levelup": "~0.6.0",
     "reconnect": "~1.0.2",
+    "ecstatic": "",
     "underscore": ""
   },
   "devDependencies": {
