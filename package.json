@@ -8,19 +8,18 @@
     "bridge": "node index.js",
     "hub": "node hub.js"
   },
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/greglu/eirobridge"
+  },
   "author": "Greg Lu <greg.lu@gmail.com>",
   "license": "BSD",
   "dependencies": {
     "dnode": "~1.0.4",
     "node-uuid": "~1.4.0",
     "levelup": "~0.6.0",
-    "reconnect": "~1.0.2",
     "underscore": "",
     "rc": "",
     "swig": ""
-  },
-  "devDependencies": {
-    "browserify": "~2.3.1"
   }
 }

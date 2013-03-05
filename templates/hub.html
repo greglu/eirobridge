@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet" />
+    <style type="text/css" media="screen">
+      .subscriber-alert {
+        display: none;
+      }
+      .add-subscriber-alert {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container-fluid">
+
+      <div class="row-fluid text-center">
+        <div class="span12">
+          <h1><a href="{{ eirobridge }}">{{ eirobridge }}</a></h1>
+        </div>
+      </div>
+
+      <div class="row-fluid text-center">
+        <div class="span12 well">
+          <h2>Subscribers</h2>
+          <div class="subscriber-alert alert">
+            <button class="close">&times;</button>
+            <div class="text"></div>
+          </div>
+          <ul class="nav nav-list subscribers">
+            {% for subscriber in subscribers %}
+            <li><span class="subscriber">{{ subscriber }}</span> <i class="icon-remove"></i></li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <div class="row-fluid text-center">
+        <div class="span12">
+          <form action="." method="POST" class="add-subscriber">
+            <div class="add-subscriber-alert help-block alert alert-success"></div>
+            <div class="input-append control-group">
+              <input class="span10" type="text" name="subscriber" placeholder="http://localhost:8080/">
+              <button class="btn" type="submit">Subscribe</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </body>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+  <script>
+    $('.add-subscriber').submit(function(e) {
+      var self = $(this);
+      var subscriberUrl = self.find('[name=subscriber]').val()
+      console.log(subscriberUrl);
+
+      $.ajax({
+        url: ".",
+        type: 'POST',
+        data: subscriberUrl
+      }).done(function(data) {
+        // var errorDialog = $('.subscriber-alert');
+        // errorDialog.removeClass('alert-error').addClass('alert-success');
+        // errorDialog.find('.text').text(data);
+        // errorDialog.fadeIn('slow');
+
+        var newListing = $('<li class="controls"><span class="subscriber">' + subscriberUrl + '</span> <i class="icon-remove"></i></li>');
+        $('.subscribers').append(newListing);
+
+        var notice = $('.add-subscriber-alert');
+        notice.removeClass('alert-error').addClass('alert-success');
+        notice.text(data);
+        notice.fadeIn('slow');
+
+        setTimeout(function() {
+          notice.fadeOut('slow');
+        }, 5000);
+
+        self.find('[name=subscriber]').val('');
+      }).fail(function(jqXHR, textStatus, errorThrown) {
+        var errorDialog = $('.add-subscriber-alert');
+        errorDialog.addClass('alert-error').removeClass('alert-success');
+        errorDialog.find('.text').text(jqXHR.responseText);
+        errorDialog.fadeIn('slow');
+
+        setTimeout(function() {
+          errorDialog.fadeOut('slow');
+        }, 5000);
+      });
+      return false;
+    });
+
+    $('.subscribers').on('click', '.icon-remove', function(e) {
+      var self = $(this);
+      var subscriberUrl = $(this).siblings('.subscriber').text();
+      console.log(subscriberUrl);
+
+      $.ajax({
+        url: ".",
+        type: 'DELETE',
+        data: subscriberUrl
+      }).done(function(data) {
+        self.parent().remove();
+      }).fail(function(jqXHR, textStatus, errorThrown) {
+        var errorDialog = $('.subscriber-alert');
+        errorDialog.addClass('alert-error').removeClass('alert-success');
+        errorDialog.find('.text').text(jqXHR.responseText);
+        errorDialog.fadeIn('slow');
+
+        setTimeout(function() {
+          errorDialog.fadeOut('slow');
+        }, 5000);
+      });
+    });
+
+    $('.subscriber-alert .close').click(function(e) {
+      $('.subscriber-alert').fadeOut('slow');
+    });
+  </script>
+
+</html>

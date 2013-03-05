@@ -6,7 +6,7 @@ var url = require('url');
 var _ = require('underscore');
 var swig  = require('swig');
 
-var indexTemplate = swig.compileFile(__dirname + '/public/index.html');
+var indexTemplate = swig.compileFile(__dirname + '/templates/hub.html');
 var rc = require('rc')('eirobridge', {
   url: 'http://localhost:8008',
   heartbeatPeriod: 45000
@@ -72,7 +72,7 @@ var server = http.createServer(function (req, res) {
         res.end(subscriber + ' successfully deleted');
       } else {
         res.writeHead(406, {'Content-Type': 'text/plain'});
-        res.end('Invalid URL. Subscription not added.');
+        res.end('Invalid URL. Subscription was not remove.');
       }
     });
   } else {
