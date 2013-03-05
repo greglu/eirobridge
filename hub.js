@@ -107,16 +107,17 @@ function connect() {
     setTimeout(connect, 5000);
   });
 
-  req.end();
-
-  req.on('upgrade', function(res, socket, upgradeHead) {
+  req.on('upgrade', function (res, socket, upgradeHead) {
     var heartBeat;
 
-    socket.setKeepAlive(true);
-    socket.setTimeout(0);
+    // socket.setKeepAlive(true);
+    // socket.setTimeout(0);
 
     var d = dnode({
-      broadcast: function(message, cb) {
+      PING : function (cb) {
+        cb('PONG');
+      },
+      broadcast: function (message, cb) {
         console.log('--- MESSAGE RECEIVED FOR BROADCASTING ---');
         console.log(message);
         console.log('--- EO BROADCAST MESSAGE ---');
@@ -149,16 +150,14 @@ function connect() {
 
             req.end(message.payload);
           });
-      },
-      PING : function(cb) {
-        cb('PONG');
       }
     });
 
     d.on('remote', function (remote) {
+      console.log('Got remote');
       server_remote = remote;
       heartBeat = setInterval(function() {
-        server_remote.PING(function(s) {});
+        server_remote.PING(function(s) { console.log("PING: %s", s); });
       }, rc.heartbeatPeriod);
       console.log("%s : %s", req.connection.remoteAddress, "CONNECTED TO SERVER");
     });
@@ -179,6 +178,7 @@ function connect() {
 
   });
 
+  req.end();
 };
 
 connect();

@@ -45,11 +45,6 @@ server.on('upgrade', function(req, socket, head) {
   // var id = uuid.v4();
   var id = req.headers['X-Forwarded-For'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
-  socket.write('HTTP/1.1 101 Web Socket Protocol Handshake\r\n' +
-               'Upgrade: WebSocket\r\n' +
-               'Connection: Upgrade\r\n' +
-               '\r\n');
-
   var d = dnode({
     PING : function(cb) {
       cb('PONG');
@@ -58,10 +53,15 @@ server.on('upgrade', function(req, socket, head) {
 
   d.on('remote', function (remote) {
     active_remotes[id] = remote;
-    remote.PING(function(s) { console.log("%s : %s", id, s); });
+    remote.PING(function(s) { console.log("%s : PING %s", id, s); });
   });
 
   socket.pipe(d).pipe(socket);
+
+  socket.write('HTTP/1.1 101 Web Socket Protocol Handshake\r\n' +
+               'Upgrade: WebSocket\r\n' +
+               'Connection: Upgrade\r\n' +
+               '\r\n');
 
   socket.on('close', function() {
     delete active_remotes[id];
