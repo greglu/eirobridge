@@ -58,7 +58,7 @@ server.on('upgrade', function(req, socket, head) {
 
   d.on('remote', function (remote) {
     active_remotes[id] = remote;
-    console.log("%s : %s", id, "CONNECTED");
+    remote.ping(function(s) { console.log("%s : %s", id, s); });
   });
 
   socket.pipe(d).pipe(socket);
