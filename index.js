@@ -65,7 +65,7 @@ server.on('upgrade', function(req, socket, head) {
 
   socket.on('close', function() {
     delete active_remotes[id];
-    console.log("%s : %s", id, "DISCONNECTED");
+    console.log("%s : %s", id, "DISCONNECTED (" + _.size(active_remotes) + " remotes still active)");
   });
 });
 
