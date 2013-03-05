@@ -43,7 +43,7 @@ var server = http.createServer(function (req, res) {
 
 server.on('upgrade', function(req, socket, head) {
   // var id = uuid.v4();
-  var id = req.headers['X-Forwarded-For'] || req.connection.remoteAddress;
+  var id = req.headers['X-Forwarded-For'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
   socket.write('HTTP/1.1 101 Web Socket Protocol Handshake\r\n' +
                'Upgrade: WebSocket\r\n' +
