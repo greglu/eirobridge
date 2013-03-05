@@ -43,7 +43,7 @@ var server = http.createServer(function (req, res) {
 
 server.on('upgrade', function(req, socket, head) {
   // var id = uuid.v4();
-  var id = req.connection.remoteAddress;
+  var id = req.headers['X-Forwarded-For'] || req.connection.remoteAddress;
 
   socket.write('HTTP/1.1 101 Web Socket Protocol Handshake\r\n' +
                'Upgrade: WebSocket\r\n' +
@@ -51,14 +51,14 @@ server.on('upgrade', function(req, socket, head) {
                '\r\n');
 
   var d = dnode({
-    ping : function(cb) {
-      cb('pong');
+    PING : function(cb) {
+      cb('PONG');
     }
   });
 
   d.on('remote', function (remote) {
     active_remotes[id] = remote;
-    remote.ping(function(s) { console.log("%s : %s", id, s); });
+    remote.PING(function(s) { console.log("%s : %s", id, s); });
   });
 
   socket.pipe(d).pipe(socket);

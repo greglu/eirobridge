@@ -9,7 +9,7 @@ var swig  = require('swig');
 var indexTemplate = swig.compileFile(__dirname + '/public/index.html');
 var rc = require('rc')('eirobridge', {
   url: 'http://localhost:8008',
-  heartbeatPeriod: 20000
+  heartbeatPeriod: 45000
 });
 
 // Append an http if none was provided
@@ -118,7 +118,7 @@ function connect() {
     var d = dnode({
       broadcast: function(message, cb) {
         console.log('--- MESSAGE RECEIVED FOR BROADCASTING ---');
-        console.log(querystring.parse(message.payload));
+        console.log(message);
         console.log('--- EO BROADCAST MESSAGE ---');
 
         subscribers.createKeyStream()
@@ -128,12 +128,16 @@ function connect() {
             subscriberOptions.headers = subscriberOptions.headers || {};
 
             _.extend(subscriberOptions.headers,
-              _.pick(message.headers, 'content-type', 'user-agent'),
               {
-                'X-Forwarded-For': message.connection.remoteAddress,
+                'X-Forwarded-For': message.connection.remoteAddress
+              },
+              _.pick(message.headers, 'content-type', 'user-agent', 'x-forwarded-for', 'X-Forwarded-For'),
+              {
                 'Content-Length': message.payload.length
               }
             );
+
+            console.log(subscriberOptions.headers);
 
             var req = http.request(subscriberOptions, function(res) {
               res.setEncoding('utf8');
@@ -145,13 +149,16 @@ function connect() {
 
             req.end(message.payload);
           });
+      },
+      PING : function(cb) {
+        cb('PONG');
       }
     });
 
     d.on('remote', function (remote) {
       server_remote = remote;
       heartBeat = setInterval(function() {
-        server_remote.ping(function(s) {});
+        server_remote.PING(function(s) {});
       }, rc.heartbeatPeriod);
       console.log("%s : %s", req.connection.remoteAddress, "CONNECTED TO SERVER");
     });
