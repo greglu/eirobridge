@@ -154,10 +154,9 @@ function connect() {
     });
 
     d.on('remote', function (remote) {
-      console.log('Got remote');
       server_remote = remote;
       heartBeat = setInterval(function() {
-        server_remote.PING(function(s) { console.log("PING: %s", s); });
+        server_remote.PING(function(s) {});
       }, rc.heartbeatPeriod);
       console.log("%s : %s", req.connection.remoteAddress, "CONNECTED TO SERVER");
     });
