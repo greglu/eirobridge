@@ -5,6 +5,7 @@
     <title></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet" />
+    <link href="http://greglu.github.com/darkstrap/darkstrap.css" rel="stylesheet" />
     <style type="text/css" media="screen">
       .subscriber-alert {
         display: none;
@@ -53,7 +54,7 @@
           </div>
           <ul class="nav nav-list subscribers">
             {% for subscriber in subscribers %}
-            <li><span class="subscriber">{{ subscriber }}</span> <i class="icon-trash"></i></li>
+            <li><span class="subscriber">{{ subscriber }}</span> <i class="icon-trash icon-white"></i></li>
             {% endfor %}
           </ul>
           <div class="row-fluid text-center">
@@ -61,7 +62,7 @@
               <form action="." method="POST" class="add-subscriber subscriber-form">
                 <div class="input-append control-group">
                   <input class="span10" type="text" name="subscriber" value="http://" />
-                  <button class="btn" type="submit">Subscribe</button>
+                  <button class="btn btn-primary" type="submit">Subscribe</button>
                 </div>
                 <div class="add-subscriber-alert help-block alert alert-success">
                   <button class="close">&times;</button>
@@ -89,7 +90,7 @@
         type: 'POST',
         data: subscriberUrl
       }).done(function(data) {
-        var newListing = $('<li class="controls"><span class="subscriber">' + subscriberUrl + '</span> <i class="icon-trash"></i></li>');
+        var newListing = $('<li class="controls"><span class="subscriber">' + subscriberUrl + '</span> <i class="icon-trash icon-white"></i></li>');
         $('.subscribers').append(newListing);
 
         var notice = $('.add-subscriber-alert');
