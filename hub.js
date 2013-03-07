@@ -49,9 +49,16 @@ var server = http.createServer(function (req, res) {
     req.on("end", function() {
       var subscriber = extractSubscriber(bodyData);
       if (subscriber) {
-        subscribers.put(subscriber, 1);
-        res.writeHead(201, {'Content-Type': 'text/plain'});
-        res.end(subscriber + ' successfully added');
+        subscribers.get(subscriber, function(err) {
+          if (err) {
+            subscribers.put(subscriber, 1);
+            res.writeHead(201, {'Content-Type': 'text/plain'});
+            res.end(subscriber + ' successfully added');
+          } else {
+            res.writeHead(303, {'Content-Type': 'text/plain'});
+            res.end(subscriber + ' already exists');
+          }
+        });
       } else {
         res.writeHead(406, {'Content-Type': 'text/plain'});
         res.end('Invalid URL. Subscription not added.');
