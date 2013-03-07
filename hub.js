@@ -51,9 +51,14 @@ var server = http.createServer(function (req, res) {
       if (subscriber) {
         subscribers.get(subscriber, function(err) {
           if (err) {
-            subscribers.put(subscriber, 1);
-            res.writeHead(201, {'Content-Type': 'text/plain'});
-            res.end(subscriber + ' successfully added');
+            subscribers.put(subscriber, 1, function(putErr) {
+              if (!putErr) {
+                res.writeHead(201, {'Content-Type': 'text/plain'});
+                res.end(subscriber + ' successfully added');
+              } else {
+                console.log("Error while adding subscriber (" + subscriber + "): " + putErr);
+              }
+            });
           } else {
             res.writeHead(303, {'Content-Type': 'text/plain'});
             res.end(subscriber + ' already exists');
@@ -116,9 +121,6 @@ function connect() {
 
   req.on('upgrade', function (res, socket, upgradeHead) {
     var heartBeat;
-
-    // socket.setKeepAlive(true);
-    // socket.setTimeout(0);
 
     var d = dnode({
       PING : function (cb) {

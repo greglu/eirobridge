@@ -10,13 +10,16 @@
         display: none;
       }
       .subscribers {
-        padding-bottom: 10px;
+        padding: 10px 0;
       }
       .subscribers li {
         padding: 5px 0;
       }
       .subscriber {
         padding-right: 10px;
+      }
+      .subscriber-header {
+        margin: 0;
       }
       .add-subscriber-alert {
         display: none;
@@ -35,14 +38,15 @@
 
       <div class="row-fluid text-center">
         <div class="span12">
-          <p>Subscribe to webhooks with the following public address</p>
+          <h6>Subscribe to webhooks with the following public endpoint</h6>
           <h2><a href="{{ eirobridge }}" target="_blank">{{ eirobridge }}</a></h2>
         </div>
       </div>
 
       <div class="row-fluid text-center">
         <div class="span12 well">
-          <h3>Internal Subscribers</h3>
+          <small class="muted">Then subscribe your internal endpoint</small>
+          <h3 class="subscriber-header">Internal Subscribers</h3>
           <div class="subscriber-alert alert">
             <button class="close">&times;</button>
             <div class="text"></div>
