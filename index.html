@@ -32,19 +32,24 @@
       <section>
         <div id="title">
           <h1>Eirobridge</h1>
-          <p>Eirobridge</p>
+          <p>Webhook subscriptions through firewalls</p>
           <hr>
           <span class="credits left">Project maintained by <a href="https://github.com/greglu">greglu</a></span>
           <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
         </div>
 
-        <h1>Eirobridge</h1>
+        <p>When you're within corporate firewalls, subscribing to <a href="http://en.wikipedia.org/wiki/Webhook" target="_blank">Webhook</a> publishers can be tricky. Corporate policies on open ports and firewall configurations can prevent development teams from using webhooks with their internal systems such as CI, builds, APIs and notifications.</p>
 
-<p><a href="https://github.com/greglu/eirobridge">https://github.com/greglu/eirobridge</a></p>
+        <p>Eirobridge was developed to address this issue. Developed with <a href="http://nodejs.org/" target="_blank">Node.js</a> and <a href="http://en.wikipedia.org/wiki/WebSocket" target="_blank">WebSockets</a>, this project attempts to solve the issue of complicated firewall configurations and setups. Development teams can now subscribe to any webhook on the public internet by deploying two components: the <em>bridge</em> and the <em>hub</em>. The following is a diagram illustrating a typical Eirobridge setup.</p>
+
+        <p><img src="./images/eirobridge-diagram.png"></p>
+
+        <p>The <em>bridge</em>, which is a long running process that's publicly accessible on the internet, has its web address given to webhook publishers. The <em>hub</em> is another long running process that sits inside your firewalls and connects to the <em>bridge</em> through a websocket on port 80. Whenever a webhook publisher pushes a new message, the <em>bridge</em> will just pass the message right through to any connected <em>hubs</em>, while preserving HTTP header information. Internally within the firewall, the hub maintains its own list of subscribers who are interested in the webhook messages being sent to the <em>bridge</em>. Subsequently, any message received by the <em>hub</em> will be redistributed to all internal subscribers.</p>
+
       </section>
 
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
+
   </body>
 </html>
