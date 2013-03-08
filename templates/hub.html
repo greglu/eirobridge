@@ -64,7 +64,7 @@
                   <input class="span10" type="text" name="subscriber" value="http://" />
                   <button class="btn btn-primary" type="submit">Subscribe</button>
                 </div>
-                <div class="add-subscriber-alert help-block alert alert-success">
+                <div class="add-subscriber-alert alert alert-success">
                   <button class="close">&times;</button>
                   <div class="text"></div>
                 </div>
@@ -113,6 +113,7 @@
           errorDialog.fadeOut('slow');
         }, 5000);
       });
+
       return false;
     });
 
@@ -141,6 +142,10 @@
 
     $('.subscriber-alert .close').click(function(e) {
       $('.subscriber-alert').fadeOut('slow');
+    });
+
+    $('.add-subscriber-alert .close').click(function(e) {
+      $('.add-subscriber-alert').fadeOut('slow');
     });
   </script>
 

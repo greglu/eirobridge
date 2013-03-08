@@ -1,4 +1,5 @@
 # Eirobridge
 
-<https://github.com/greglu/eirobridge>
+<http://greglu.github.com/eirobridge/>
 
+![Eirobridge Diagram](http://greglu.github.com/eirobridge/images/eirobridge-diagram.png)
