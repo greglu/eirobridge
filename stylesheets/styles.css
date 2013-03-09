@@ -401,6 +401,7 @@ legend {
   /* 2 */
   *margin-left: -7px;
   /* 3 */
+  text-align: center;
 }
 
 /*
@@ -848,4 +849,10 @@ section #title .credits.right {
   nav {
     display: none;
   }
+}
+
+.caption {
+  display: block;
+  text-align: center;
+  font-size: 0.85em;
 }
