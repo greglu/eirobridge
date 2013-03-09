@@ -95,8 +95,13 @@ var server = http.createServer(function (req, res) {
         activeSubscribers.push(data);
       })
       .on('end', function() {
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.end(indexTemplate.render({ eirobridge: rc.url, subscribers: activeSubscribers }));
+        if ((req.headers['accept'] || req.headers['Accept']) == "application/json") {
+          res.writeHead(200, {'Content-Type': 'application/json'});
+          res.end(JSON.stringify(activeSubscribers));
+        } else {
+          res.writeHead(200, {'Content-Type': 'text/html'});
+          res.end(indexTemplate.render({ eirobridge: rc.url, subscribers: activeSubscribers }));
+        }
       });
   }
 });
