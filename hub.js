@@ -1,20 +1,22 @@
-var http = require('http');
-var dnode = require('dnode');
-var querystring = require('querystring');
-var levelup = require('levelup');
-var url = require('url');
-var _ = require('underscore');
-var swig  = require('swig');
+var http = require('http')
+  , dnode = require('dnode')
+  , querystring = require('querystring')
+  , levelup = require('levelup')
+  , url = require('url')
+  , _ = require('underscore')
+  , swig  = require('swig')
 
 var indexTemplate = swig.compileFile(__dirname + '/templates/hub.html');
 var rc = require('rc')('eirobridge', {
-  url: 'http://localhost:8008',
-  heartbeatPeriod: 45000
+  port: 8010,
+  bridge: 'http://localhost:8009',
+  heartbeatPeriod: 45000,
+  password: ''
 });
 
 // Append an http if none was provided
-if (!rc.url.match(/^\s*(https*:\/\/.*)/)) {
-  rc.url = 'http://' + rc.url;
+if (!rc.bridge.match(/^\s*(https*:\/\/.*)/)) {
+  rc.bridge = 'http://' + rc.bridge;
 }
 
 var subscribers = levelup('./subscribers');
@@ -100,22 +102,27 @@ var server = http.createServer(function (req, res) {
           res.end(JSON.stringify(activeSubscribers));
         } else {
           res.writeHead(200, {'Content-Type': 'text/html'});
-          res.end(indexTemplate.render({ eirobridge: rc.url, subscribers: activeSubscribers }));
+          res.end(indexTemplate.render({ eirobridge: rc.bridge, subscribers: activeSubscribers }));
         }
       });
   }
 });
 
-server.listen(8010);
+server.listen(rc.port);
+console.log("Hub listening on port %s and connected to bridge: %s", rc.port, rc.bridge);
 
 
 function connect() {
 
-  var eirobridgeOptions = url.parse(rc.url);
+  var eirobridgeOptions = url.parse(rc.bridge);
   eirobridgeOptions.headers = {
       'Connection': 'Upgrade',
       'Upgrade': 'websocket'
     };
+
+  if (rc.password) {
+    eirobridgeOptions.headers['x-eirobridge-authentication'] = rc.password;
+  }
 
   var req = http.request(eirobridgeOptions);
 

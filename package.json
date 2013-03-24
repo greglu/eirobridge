@@ -1,6 +1,6 @@
 {
   "name": "eirobridge",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Eirobridge",
   "main": "index.js",
   "scripts": {

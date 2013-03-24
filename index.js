@@ -1,10 +1,11 @@
-var dnode = require('dnode');
-var http = require('http');
-var uuid = require('node-uuid');
-var _ = require('underscore');
+var dnode = require('dnode')
+  , http = require('http')
+  , uuid = require('node-uuid')
+  , _ = require('underscore');
 
 var rc = require('rc')('eirobridge', {
-  port: 8008
+  port: 8009,
+  password: ''
 });
 
 var active_remotes = {};
@@ -42,7 +43,6 @@ var server = http.createServer(function (req, res) {
 });
 
 server.on('upgrade', function(req, socket, head) {
-  // var id = uuid.v4();
   var id = req.headers['X-Forwarded-For'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
   var d = dnode({
@@ -52,6 +52,16 @@ server.on('upgrade', function(req, socket, head) {
   });
 
   d.on('remote', function (remote) {
+
+    if (rc.password) {
+      var clientPassword = req.headers['x-eirobridge-authentication'];
+      if (clientPassword != rc.password) {
+        socket.destroy();
+        console.log("%s : Client failed to authenticate", id);
+        return;
+      }
+    }
+
     active_remotes[id] = remote;
     remote.PING(function(s) { console.log("%s : PING %s", id, s); });
   });
@@ -64,9 +74,11 @@ server.on('upgrade', function(req, socket, head) {
                '\r\n');
 
   socket.on('close', function() {
-    delete active_remotes[id];
-    console.log("%s : %s", id, "DISCONNECTED (" + _.size(active_remotes) + " remotes still active)");
+    if (!(delete active_remotes[id])) {
+      console.log("%s : %s", id, "DISCONNECTED (" + _.size(active_remotes) + " remotes still active)");
+    }
   });
 });
 
 server.listen(rc.port);
+console.log("Bridge listening on port %s", rc.port);
