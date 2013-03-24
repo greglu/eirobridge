@@ -62,23 +62,23 @@
         <pre><code>$ npm install</code></pre>
 
         <h4>Step 2</h4>
-        <pre><code># To be run on the server designated as the Bridge (publicly accessible on the internet)
-$ node index.js</code></pre>
-        <h5>Bridge configuration options</h5>
+        <p>To be run on the server designated as the Bridge (publicly accessible on the internet):</p>
+        <pre><code>$ node index.js</code></pre>
+        <p>Bridge configuration options</p>
         <ul>
           <li><strong>--port</strong> (defaults to 8009): Set a port for the bridge to run on.</li>
           <li><strong>--password</strong> (defaults to ''): Set a password on the bridge which requires connecting hubs to authenticate with.</li>
         </ul>
 
         <h4>Step 3</h4>
-        <pre><code># To be run on the server designated as the Hub (within your firewall)
-$ node hub.js --bridge http://url-to-the-bridge</code></pre>
-        <h5>Hub configuration options</h5>
+        <p>To be run on the server designated as the Hub (within your firewall):
+        <pre><code>$ node hub.js --bridge http://url-to-the-bridge</code></pre>
+        <p>Hub configuration options</p>
         <ul>
           <li><strong>--port</strong> (defaults to 8010): Set a port for the hub to run on.</li>
           <li><strong>--bridge</strong> (defaults to 'http://localhost:8009'): URL to the bridge</li>
           <li><strong>--password</strong> (defaults to ''): If the bridge requires a password, set it with this.</li>
-          <li><strong>--heartbeatPeriod</strong> (defaults to 45000): How often a heartbeat (or ping) message gets sent to the bridge. This is dependent on your environment.</li>
+          <li><strong>--heartbeatPeriod</strong> (defaults to 45000): How often, in milliseconds, a heartbeat (or ping) message gets sent to the bridge in order to keep the socket open. This is dependent on your server and deployment.</li>
         </ul>
 
         <h4>Step 3</h4>
